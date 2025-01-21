@@ -6,20 +6,16 @@
 
 const int mapHeight = 31;
 const int mapWidth = 82;
+const int border_padding = 2;
 
+// charcters structure
 struct character {
   int yLoc;
   int xLoc;
   char *icon;
-};
-struct character pacman;
-struct character red_ghost;
-struct character yellow_ghost;
-struct character blue_ghost;
-struct character pink_ghost;
+}pacman, red_ghost, yellow_ghost, blue_ghost, pink_ghost;
 
 // Moment Functions
-
 void mvup();
 void mvdown();
 void mvright();
@@ -119,7 +115,7 @@ int main(){
 
   //pacman properties
   pacman.xLoc = 23;
-  pacman.yLoc = 39;
+  pacman.yLoc = 40;
   pacman.icon = "ᗧ";
 
   //Red Ghost
@@ -152,10 +148,10 @@ int main(){
   refresh();
 
   while(isRunning){
-    box(win, 0, 0);
-    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· ");
-    drawMap(win);
-    drawChar(charWin);
+    box(win, 0, 0); // border
+    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
+    drawMap(win); // map
+    drawChar(charWin); // pacman, ghosts
     wrefresh(win);
     wrefresh(charWin);
   }
@@ -172,11 +168,11 @@ void drawMap(WINDOW *win){
       char str[2] = {map[y][x], '\0'};
       if(map[y][x] != '.'){
         wattron(win, COLOR_PAIR(1));
-        mvwprintw(win, y+2, x+2, str);
+        mvwprintw(win, y+border_padding, x+border_padding, str);
         wattroff(win, COLOR_PAIR(1));
       }else{
         wattron(win, COLOR_PAIR(2));
-        mvwprintw(win, y+2, x+2, str);
+        mvwprintw(win, y+border_padding, x+border_padding, str);
         wattroff(win, COLOR_PAIR(2));
       }
     }
@@ -185,22 +181,22 @@ void drawMap(WINDOW *win){
 
 void drawChar(WINDOW *charWin){
   wattron(charWin, COLOR_PAIR(3));
-  mvwprintw(charWin, pacman.xLoc + 2, pacman.yLoc + 2, pacman.icon); // pacman
+  mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, pacman.icon); // pacman
   wattroff(charWin, COLOR_PAIR(3));
 
   wattron(charWin, COLOR_PAIR(5));
-  mvwprintw(charWin, red_ghost.xLoc + 2, red_ghost.yLoc + 2, red_ghost.icon); //Red Ghost
+  mvwprintw(charWin, red_ghost.xLoc + border_padding, red_ghost.yLoc + border_padding, red_ghost.icon); //Red Ghost
   wattroff(charWin, COLOR_PAIR(5));
 
   wattron(charWin, COLOR_PAIR(4));
-  mvwprintw(charWin, blue_ghost.xLoc + 2, blue_ghost.yLoc + 2, blue_ghost.icon); //Blue Ghost
+  mvwprintw(charWin, blue_ghost.xLoc + border_padding, blue_ghost.yLoc + border_padding, blue_ghost.icon); //Blue Ghost
   wattroff(charWin, COLOR_PAIR(4));
 
   wattron(charWin, COLOR_PAIR(3));
-  mvwprintw(charWin, yellow_ghost.xLoc + 2, yellow_ghost.yLoc + 2, yellow_ghost.icon); //Yellow Ghost
+  mvwprintw(charWin, yellow_ghost.xLoc + border_padding, yellow_ghost.yLoc + border_padding, yellow_ghost.icon); //Yellow Ghost
   wattroff(charWin, COLOR_PAIR(3));
 
   wattron(charWin, COLOR_PAIR(6));
-  mvwprintw(charWin, pink_ghost.xLoc + 2, pink_ghost.yLoc + 2, pink_ghost.icon); //Pink Ghost
+  mvwprintw(charWin, pink_ghost.xLoc + border_padding, pink_ghost.yLoc + border_padding, pink_ghost.icon); //Pink Ghost
   wattroff(charWin, COLOR_PAIR(6));
 }
