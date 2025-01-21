@@ -106,13 +106,13 @@ int main(){
   initscr(); //initalize ncurses and clears screen
   start_color(); //Enable colour output
   {
-    init_pair(1, COLOR_BLUE, COLOR_BLACK);
+    init_pair(1, COLOR_BLUE, COLOR_BLACK); // walls
     init_color(COLOR_WHITE + 1, 1000, 1000, 400);
-    init_pair(2, COLOR_WHITE + 1, COLOR_BLACK);
-    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
-    init_pair(4, COLOR_BLUE, COLOR_BLACK);
-    init_pair(5, COLOR_RED, COLOR_BLACK);
-    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
+    init_pair(2, COLOR_WHITE + 1, COLOR_BLACK);// pills
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK); //ghost
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);  //ghost
+    init_pair(5, COLOR_RED, COLOR_BLACK); //ghost
+    init_pair(6, COLOR_MAGENTA, COLOR_BLACK); //ghost
   }
   noecho(); //hides user inputs
   curs_set(0); //hides curser
@@ -123,16 +123,24 @@ int main(){
   pacman.icon = "ᗧ";
 
   //Red Ghost
-
+  red_ghost.xLoc = 14;
+  red_ghost.yLoc = 33;
+  red_ghost.icon = "ᗝ";
 
   //Blue Ghost
-
+  blue_ghost.xLoc = 14;
+  blue_ghost.yLoc = 38;
+  blue_ghost.icon = "ᗝ";
 
   //Yellow Ghost
+  yellow_ghost.xLoc = 14;
+  yellow_ghost.yLoc = 43;
+  yellow_ghost.icon = "ᗝ";
 
-  
   //Pink Ghost
-
+  pink_ghost.xLoc = 14;
+  pink_ghost.yLoc = 48;
+  pink_ghost.icon = "ᗝ";
 
 
   int isRunning = 1;
@@ -176,13 +184,23 @@ void drawMap(WINDOW *win){
 }
 
 void drawChar(WINDOW *charWin){
-  // pacman
   wattron(charWin, COLOR_PAIR(3));
-  mvwprintw(charWin, pacman.xLoc + 2, pacman.yLoc + 2, "ᗧ"); 
+  mvwprintw(charWin, pacman.xLoc + 2, pacman.yLoc + 2, pacman.icon); // pacman
   wattroff(charWin, COLOR_PAIR(3));
 
-  //Red Ghost
-  //Blue Ghost
-  //Yellow Ghost
-  //Pink Ghost
+  wattron(charWin, COLOR_PAIR(5));
+  mvwprintw(charWin, red_ghost.xLoc + 2, red_ghost.yLoc + 2, red_ghost.icon); //Red Ghost
+  wattroff(charWin, COLOR_PAIR(5));
+
+  wattron(charWin, COLOR_PAIR(4));
+  mvwprintw(charWin, blue_ghost.xLoc + 2, blue_ghost.yLoc + 2, blue_ghost.icon); //Blue Ghost
+  wattroff(charWin, COLOR_PAIR(4));
+
+  wattron(charWin, COLOR_PAIR(3));
+  mvwprintw(charWin, yellow_ghost.xLoc + 2, yellow_ghost.yLoc + 2, yellow_ghost.icon); //Yellow Ghost
+  wattroff(charWin, COLOR_PAIR(3));
+
+  wattron(charWin, COLOR_PAIR(6));
+  mvwprintw(charWin, pink_ghost.xLoc + 2, pink_ghost.yLoc + 2, pink_ghost.icon); //Pink Ghost
+  wattroff(charWin, COLOR_PAIR(6));
 }
