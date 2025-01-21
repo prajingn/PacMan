@@ -13,8 +13,13 @@ struct character {
   char *icon;
 };
 struct character pacman;
+struct character red_ghost;
+struct character yellow_ghost;
+struct character blue_ghost;
+struct character pink_ghost;
 
 // Moment Functions
+
 void mvup();
 void mvdown();
 void mvright();
@@ -23,7 +28,10 @@ void mvleft();
 // Draw Map Functions
 void drawMap(WINDOW *win);
 
-const char map[31][82 + 1] = {
+// Draw Characters function
+void drawChar(WINDOW *win);
+
+char map[31][82 + 1] = {
 "+ ------------------------------------ +  + ------------------------------------ +",
 "|  .  .  .  .  .  .  .  .  .  .  .  .  |  |  .  .  .  .  .  .  .  .  .  .  .  .  |",
 "|  .  + ------ +  .  + --------- +  .  |  |  .  + --------- +  .  + ------ +  .  |",
@@ -57,6 +65,40 @@ const char map[31][82 + 1] = {
 "+ ------------------------------------------------------------------------------ +"
 };
 
+const char path_map[31][82 + 1] = {
+"+ ------------------------------------ +  + ------------------------------------ +",
+"|  pppppppppppppppppppppppppppppppppp  |  |  pppppppppppppppppppppppppppppppppp  |",
+"|  p  + ------ +  p  + --------- +  p  |  |  p  + --------- +  p  + ------ +  p  |",
+"|  p  |        |  p  |           |  p  |  |  p  |           |  p  |        |  p  |",
+"|  p  + ------ +  p  + --------- +  p  +--+  p  + --------- +  p  + ------ +  p  |",
+"|  pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp  |",
+"|  p  + ------ +  p  +  +  p  + ------------------ +  p  +  +  p  + ------ +  p  |",
+"|  p  + ------ +  p  |  |  p  + ------ +  + ------ +  p  |  |  p  + ------ +  p  |",
+"|  pppppppppppppppp  |  |  pppppppppp  |  |  pppppppppp  |  |  p pppppppppppppp  |",
+"+ ------------ +  p  |  + ------ +  p  |  |  p  + ------ +  |  p  + ------------ +",
+"               |  p  |  + ------ +  p  +--+  p  + ------ +  |  p  |               ",
+"               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
+"               |  p  |  |  p  + ------gggggg------ +  p  |  |  p  |               ",
+"+------------- +  p  +  +  p  |  gggggggggggggggg  |  p  +  +  p  + -------------+",
+"| pppppppppppppppppppppppppp  |  gggggggggggggggg  |  pppppppppppppppppppppppppp |",
+"+------------- +  p  +  +  p  |                    |  p  +  +  p  + -------------+",
+"               |  p  |  |  p  + ------------------ +  p  |  |  p  |               ",
+"               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
+"               |  p  |  |     + ------------------ +     |  |  p  |               ",
+"+ ------------ +  p  +  +     + ------ +  + ------ +     +  +  p  + ------------ +",
+"|  pppppppppppppppppppppppppppppppppp  |  |  pppppppppppppppppppppppppppppppppp  |",
+"|  p  + ------ +  p  + --------- +  p  |  |  p  + --------- +  p  + ------ +  p  |",
+"|  p  + --- +  |  p  + --------- +  p  +--+  p  + --------- +  p  |  + --- +  p  |",
+"|  ppppppp  |  |  pppppppppppppppppppppppppppppppppppppppppppppp  |  |  ppppppp  |",
+"+ --- +  p  |  |  p  +  +  p  + ------------------ +  p  +  +  p  |  |  p  + --- +",
+"+ --- +  p  +  +  p  |  |  p  + ------ +  + ------ +  p  |  |  p  +  +  p  + --- +",
+"|  pppppppppppppppp  |  |  pppppppppp  |  |  pppppppppp  |  |  pppppppppppppppp  |",
+"|  p  + ------------ +  + ------ +  p  |  |  p  + ------ +  + ------------ +  p  |",
+"|  p  + ------------------------ +  p  +--+  p  + ------------------------ +  p  |",
+"|  pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp  |",
+"+ ------------------------------------------------------------------------------ +"
+}; // p => pacman path; p || g => ghost path
+
 // main 
 int main(){
 
@@ -67,24 +109,47 @@ int main(){
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_color(COLOR_WHITE + 1, 1000, 1000, 400);
     init_pair(2, COLOR_WHITE + 1, COLOR_BLACK);
+    init_pair(3, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(4, COLOR_BLUE, COLOR_BLACK);
+    init_pair(5, COLOR_RED, COLOR_BLACK);
+    init_pair(6, COLOR_MAGENTA, COLOR_BLACK);
   }
   noecho(); //hides user inputs
   curs_set(0); //hides curser
+
+  //pacman properties
+  pacman.xLoc = 23;
+  pacman.yLoc = 39;
+  pacman.icon = "ᗧ";
+
+  //Red Ghost
+
+
+  //Blue Ghost
+
+
+  //Yellow Ghost
+
+  
+  //Pink Ghost
+
+
 
   int isRunning = 1;
 
   //window parameters
   int height = mapHeight + 4, width = mapWidth + 4, start_y = 0, start_x = 0;
   WINDOW *win = newwin(height, width, start_y, start_x);
-
+  WINDOW *charWin = newwin(height, width, start_y, start_x);
   refresh();
-  box(win, 0, 0);
-  mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· ");
-  wrefresh(win);
 
   while(isRunning){
+    box(win, 0, 0);
+    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· ");
     drawMap(win);
+    drawChar(charWin);
     wrefresh(win);
+    wrefresh(charWin);
   }
 
   getch();
@@ -108,4 +173,16 @@ void drawMap(WINDOW *win){
       }
     }
   }
+}
+
+void drawChar(WINDOW *charWin){
+  // pacman
+  wattron(charWin, COLOR_PAIR(3));
+  mvwprintw(charWin, pacman.xLoc + 2, pacman.yLoc + 2, "ᗧ"); 
+  wattroff(charWin, COLOR_PAIR(3));
+
+  //Red Ghost
+  //Blue Ghost
+  //Yellow Ghost
+  //Pink Ghost
 }
