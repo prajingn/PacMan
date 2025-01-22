@@ -3,10 +3,19 @@
 
 # include <ncurses.h>
 # include <locale.h>
+# include <unistd.h>
 
 const int mapHeight = 31;
 const int mapWidth = 82;
 const int border_padding = 2;
+
+// Directions
+#define UP 0
+#define DOWN 1
+#define LEFT 2
+#define RIGHT 3
+
+int isRunning = 1, direction = LEFT;
 
 // charcters structure
 struct character {
@@ -15,11 +24,8 @@ struct character {
   char *icon;
 }pacman, red_ghost, yellow_ghost, blue_ghost, pink_ghost;
 
-// Moment Functions
-void mvup();
-void mvdown();
-void mvright();
-void mvleft();
+// input Functions
+void input(WINDOW *charWin);
 
 // Draw Map Functions
 void drawMap(WINDOW *win);
@@ -138,25 +144,21 @@ int main(){
   pink_ghost.yLoc = 48;
   pink_ghost.icon = "ᗝ";
 
-
-  int isRunning = 1;
-
   //window parameters
   int height = mapHeight + 4, width = mapWidth + 4, start_y = 0, start_x = 0;
   WINDOW *win = newwin(height, width, start_y, start_x);
-  WINDOW *charWin = newwin(height, width, start_y, start_x);
+  nodelay(win, TRUE); // Enable non-blocking input
   refresh();
 
   while(isRunning){
     box(win, 0, 0); // border
     mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
     drawMap(win); // map
-    drawChar(charWin); // pacman, ghosts
+    drawChar(win); // pacman, ghosts
+    usleep(50000); // delay
     wrefresh(win);
-    wrefresh(charWin);
+    input(win);
   }
-
-  getch();
 
   endwin(); //dealocates memory and exits ncurses
   return 0;
@@ -165,14 +167,13 @@ int main(){
 void drawMap(WINDOW *win){ 
   for(int x=0; x < mapWidth; x++){
     for(int y=0; y < mapHeight; y++){
-      char str[2] = {map[y][x], '\0'};
       if(map[y][x] != '.'){
         wattron(win, COLOR_PAIR(1));
-        mvwprintw(win, y+border_padding, x+border_padding, str);
+        mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
         wattroff(win, COLOR_PAIR(1));
       }else{
         wattron(win, COLOR_PAIR(2));
-        mvwprintw(win, y+border_padding, x+border_padding, str);
+        mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
         wattroff(win, COLOR_PAIR(2));
       }
     }
@@ -199,4 +200,45 @@ void drawChar(WINDOW *charWin){
   wattron(charWin, COLOR_PAIR(6));
   mvwprintw(charWin, pink_ghost.xLoc + border_padding, pink_ghost.yLoc + border_padding, pink_ghost.icon); //Pink Ghost
   wattroff(charWin, COLOR_PAIR(6));
+}
+
+// input function
+void input(WINDOW *charWin){
+  char ch = wgetch(charWin); // Check for user input
+
+  // Update direction based on input
+  if (ch == 'w') direction = UP;
+  if (ch == 's') direction = DOWN;
+  if (ch == 'a') direction = LEFT;
+  if (ch == 'd') direction = RIGHT;
+  if (ch == 'q') isRunning = 0; // Quit on 'q'
+        
+  switch(direction){
+
+    case UP:
+      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
+      pacman.xLoc--;
+      pacman.icon = "ᗢ";
+      break;
+
+    case LEFT:
+      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
+      pacman.yLoc--;
+      pacman.icon = "ᗤ";
+      break;
+
+    case DOWN:
+      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
+      pacman.xLoc++;
+      pacman.icon = "ᗣ";
+      break;
+
+    case RIGHT:
+      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
+      pacman.yLoc++;
+      pacman.icon = "ᗧ";
+      break;
+    default:
+      break;
+  }
 }
