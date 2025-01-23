@@ -16,6 +16,7 @@ const int border_padding = 2;
 #define RIGHT 3
 
 int isRunning = 1, direction = LEFT;
+char ch, oldCh;
 
 // charcters structure
 struct character {
@@ -43,17 +44,17 @@ char map[31][82 + 1] = {
 "|  .  + ------ +  .  +  +  .  + ------------------ +  .  +  +  .  + ------ +  .  |",
 "|  .  + ------ +  .  |  |  .  + ------ +  + ------ +  .  |  |  .  + ------ +  .  |",
 "|  .  .  .  .  .  .  |  |  .  .  .  .  |  |  .  .  .  .  |  |  .  .  .  .  .  .  |",
-"+ ------------ +  .  |  + ------ +     |  |     + ------ +  |  .  + ------------ +",
-"               |  .  |  + ------ +     +--+     + ------ +  |  .  |               ",
-"               |  .  |  |                                |  |  .  |               ",
-"               |  .  |  |     + ------______------ +     |  |  .  |               ",
-"+------------- +  .  +  +     |                    |     +  +  .  + -------------+",
-"|  .  .  .  .  .  .           |                    |           .  .  .  .  .  .  |",
-"+------------- +  .  +  +     |                    |     +  +  .  + -------------+",
-"               |  .  |  |     + ------------------ +     |  |  .  |               ",
-"               |  .  |  |                                |  |  .  |               ",
-"               |  .  |  |     + ------------------ +     |  |  .  |               ",
-"+ ------------ +  .  +  +     + ------ +  + ------ +     +  +  .  + ------------ +",
+"+ ------------ +  .  |  + ------ +  .  |  |  .  + ------ +  |  .  + ------------ +",
+"               |  .  |  + ------ +  .  +--+  .  + ------ +  |  .  |               ",
+"               |  .  |  |  .  .  .  .  .  .  .  .  .  .  |  |  .  |               ",
+"               |  .  |  |  .  + ------______------ +  .  |  |  .  |               ",
+"+------------- +  .  +  +  .  |                    |  .  +  +  .  + -------------+",
+"|  .  .  .  .  .  .  .  .  .  |                    |  .  .  .  .  .  .  .  .  .  |",
+"+------------- +  .  +  +  .  |                    |  .  +  +  .  + -------------+",
+"               |  .  |  |  .  + ------------------ +  .  |  |  .  |               ",
+"               |  .  |  |  .  .  .  .  .  .  .  .  .  .  |  |  .  |               ",
+"               |  .  |  |  .  + ------------------ +  .  |  |  .  |               ",
+"+ ------------ +  .  +  +  .  + ------ +  + ------ +  .  +  +  .  + ------------ +",
 "|  .  .  .  .  .  .  .  .  .  .  .  .  |  |  .  .  .  .  .  .  .  .  .  .  .  .  |",
 "|  .  + ------ +  .  + --------- +  .  |  |  .  + --------- +  .  + ------ +  .  |",
 "|  .  + --- +  |  .  + --------- +  .  +--+  .  + --------- +  .  |  + --- +  .  |",
@@ -76,7 +77,7 @@ const char path_map[31][82 + 1] = {
 "|  pppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp  |",
 "|  p  + ------ +  p  +  +  p  + ------------------ +  p  +  +  p  + ------ +  p  |",
 "|  p  + ------ +  p  |  |  p  + ------ +  + ------ +  p  |  |  p  + ------ +  p  |",
-"|  pppppppppppppppp  |  |  pppppppppp  |  |  pppppppppp  |  |  p pppppppppppppp  |",
+"|  pppppppppppppppp  |  |  pppppppppp  |  |  pppppppppp  |  |  pppppppppppppppp  |",
 "+ ------------ +  p  |  + ------ +  p  |  |  p  + ------ +  |  p  + ------------ +",
 "               |  p  |  + ------ +  p  +--+  p  + ------ +  |  p  |               ",
 "               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
@@ -86,8 +87,8 @@ const char path_map[31][82 + 1] = {
 "+------------- +  p  +  +  p  |                    |  p  +  +  p  + -------------+",
 "               |  p  |  |  p  + ------------------ +  p  |  |  p  |               ",
 "               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
-"               |  p  |  |     + ------------------ +     |  |  p  |               ",
-"+ ------------ +  p  +  +     + ------ +  + ------ +     +  +  p  + ------------ +",
+"               |  p  |  |  p  + ------------------ +  p  |  |  p  |               ",
+"+ ------------ +  p  +  +  p  + ------ +  + ------ +  p  +  +  p  + ------------ +",
 "|  pppppppppppppppppppppppppppppppppp  |  |  pppppppppppppppppppppppppppppppppp  |",
 "|  p  + ------ +  p  + --------- +  p  |  |  p  + --------- +  p  + ------ +  p  |",
 "|  p  + --- +  |  p  + --------- +  p  +--+  p  + --------- +  p  |  + --- +  p  |",
@@ -202,43 +203,57 @@ void drawChar(WINDOW *charWin){
   wattroff(charWin, COLOR_PAIR(6));
 }
 
-// input function
-void input(WINDOW *charWin){
-  char ch = wgetch(charWin); // Check for user input
+void input(WINDOW *charWin) {
+    static int lastValidDirection = LEFT; // Retain the last valid direction
+    static int desiredDirection = LEFT;  // Track the desired direction from user input
+    oldCh = ch;
+    ch = wgetch(charWin); // Get user input
 
-  // Update direction based on input
-  if (ch == 'w') direction = UP;
-  if (ch == 's') direction = DOWN;
-  if (ch == 'a') direction = LEFT;
-  if (ch == 'd') direction = RIGHT;
-  if (ch == 'q') isRunning = 0; // Quit on 'q'
-        
-  switch(direction){
+    // Update desired direction based on key press
+    if (ch == 'w') desiredDirection = UP;
+    if (ch == 's') desiredDirection = DOWN;
+    if (ch == 'a') desiredDirection = LEFT;
+    if (ch == 'd') desiredDirection = RIGHT;
+    if (ch == 'q') isRunning = 0; // Quit on 'q'
 
-    case UP:
-      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
-      pacman.xLoc--;
-      pacman.icon = "ᗢ";
-      break;
+    int newX = pacman.xLoc;
+    int newY = pacman.yLoc;
+    char *newIcon = pacman.icon; // Temporary variable to update the icon only if the move is valid
 
-    case LEFT:
-      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
-      pacman.yLoc--;
-      pacman.icon = "ᗤ";
-      break;
+    // Check if the desired direction is valid
+    switch (desiredDirection) {
+        case UP:    newX = pacman.xLoc - 1; newY = pacman.yLoc; newIcon = "ᗢ"; break;
+        case DOWN:  newX = pacman.xLoc + 1; newY = pacman.yLoc; newIcon = "ᗣ"; break;
+        case LEFT:  newX = pacman.xLoc;     newY = pacman.yLoc - 1; newIcon = "ᗤ"; break;
+        case RIGHT: newX = pacman.xLoc;     newY = pacman.yLoc + 1; newIcon = "ᗧ"; break;
+        default: break;
+    }
 
-    case DOWN:
-      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
-      pacman.xLoc++;
-      pacman.icon = "ᗣ";
-      break;
+    if (path_map[newX][newY] == 'p') {
+        // If the desired direction is valid, move Pac-Man and update the direction and icon
+        mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
+        pacman.xLoc = newX;
+        pacman.yLoc = newY;
+        pacman.icon = newIcon; // Update the icon
+        lastValidDirection = desiredDirection; // Update last valid direction
+    } else {
+        // If the desired direction is not valid, keep moving in the last valid direction
+        newX = pacman.xLoc;
+        newY = pacman.yLoc;
 
-    case RIGHT:
-      mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " ");
-      pacman.yLoc++;
-      pacman.icon = "ᗧ";
-      break;
-    default:
-      break;
-  }
+        switch (lastValidDirection) {
+            case UP:    newX = pacman.xLoc - 1; newY = pacman.yLoc; break;
+            case DOWN:  newX = pacman.xLoc + 1; newY = pacman.yLoc; break;
+            case LEFT:  newX = pacman.xLoc;     newY = pacman.yLoc - 1; break;
+            case RIGHT: newX = pacman.xLoc;     newY = pacman.yLoc + 1; break;
+            default: break;
+        }
+
+        if (path_map[newX][newY] == 'p') {
+            // Continue moving in the last valid direction if possible
+            mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
+            pacman.xLoc = newX;
+            pacman.yLoc = newY;
+        }
+    }
 }
