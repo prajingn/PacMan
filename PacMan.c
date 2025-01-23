@@ -15,8 +15,7 @@ const int border_padding = 2;
 #define LEFT 2
 #define RIGHT 3
 
-int isRunning = 1, direction = LEFT;
-char ch, oldCh;
+int isRunning = 1, direction = LEFT, score = 0;
 
 // charcters structure
 struct character {
@@ -33,6 +32,9 @@ void drawMap(WINDOW *win);
 
 // Draw Characters function
 void drawChar(WINDOW *win);
+
+// Check score function
+int checkScore();
 
 char map[31][82 + 1] = {
 "+ ------------------------------------ +  + ------------------------------------ +",
@@ -154,8 +156,10 @@ int main(){
   while(isRunning){
     box(win, 0, 0); // border
     mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
+    mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
     drawMap(win); // map
     drawChar(win); // pacman, ghosts
+    score = checkScore(); //checks pellets left
     usleep(50000); // delay
     wrefresh(win);
     input(win);
@@ -168,14 +172,22 @@ int main(){
 void drawMap(WINDOW *win){ 
   for(int x=0; x < mapWidth; x++){
     for(int y=0; y < mapHeight; y++){
-      if(map[y][x] != '.'){
-        wattron(win, COLOR_PAIR(1));
-        mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
-        wattroff(win, COLOR_PAIR(1));
-      }else{
+      if(map[y][x] == '.'){
         wattron(win, COLOR_PAIR(2));
         mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
         wattroff(win, COLOR_PAIR(2));
+      }
+
+      else if(map[y][x] == '_'){
+        wattron(win, COLOR_PAIR(5));
+        mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
+        wattroff(win, COLOR_PAIR(5));
+      }
+
+      else{
+        wattron(win, COLOR_PAIR(1));
+        mvwprintw(win, y+border_padding, x+border_padding, "%c", map[y][x]);
+        wattroff(win, COLOR_PAIR(1));
       }
     }
   }
@@ -206,8 +218,7 @@ void drawChar(WINDOW *charWin){
 void input(WINDOW *charWin) {
     static int lastValidDirection = LEFT; // Retain the last valid direction
     static int desiredDirection = LEFT;  // Track the desired direction from user input
-    oldCh = ch;
-    ch = wgetch(charWin); // Get user input
+    char ch = wgetch(charWin); // Get user input
 
     // Update desired direction based on key press
     if (ch == 'w') desiredDirection = UP;
@@ -256,4 +267,13 @@ void input(WINDOW *charWin) {
             pacman.yLoc = newY;
         }
     }
+}
+
+int checkScore(){
+    if(map[pacman.xLoc][pacman.yLoc] == '.'){
+      map[pacman.xLoc][pacman.yLoc] = ' ';
+      score += 5;
+    }
+
+  return score;
 }
