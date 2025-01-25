@@ -27,13 +27,16 @@ struct character {
 }pacman, red_ghost, yellow_ghost, blue_ghost, pink_ghost;
 
 // input Functions
-void input(WINDOW *charWin);
+void input(WINDOW*);
 
 // Draw Map Functions
-void drawMap(WINDOW *win);
+void drawMap(WINDOW*);
 
 // Draw Characters function
-void drawChar(WINDOW *win);
+void drawChar(WINDOW*);
+
+// Window decor
+void printBorderDecor(WINDOW*, int, int);
 
 // Set Color Pallet
 void setColors();
@@ -142,9 +145,7 @@ int main(){
 
   while(isRunning){
     box(win, 0, 0); // border
-    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
-    mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
-        mvwprintw(win, height-1, width - 30, " MOVE - W/A/S/D, QUIT - q "); // keys
+    printBorderDecor(win, height, width);
     drawMap(win); // map
     drawChar(win); // pacman, ghosts
     moveGhosts();
@@ -198,6 +199,12 @@ void setCharacterProperties(){
   pink_ghost.icon = "ᗝ";
 }
 
+void printBorderDecor(WINDOW* win, int height, int width){
+  mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
+  mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
+  mvwprintw(win, height-1, width - 30, " MOVE - W/A/S/D, QUIT - q "); // keys
+}
+
 void drawMap(WINDOW *win){ 
   for(int x=0; x < mapWidth; x++){
     for(int y=0; y < mapHeight; y++){
@@ -222,32 +229,32 @@ void drawMap(WINDOW *win){
   }
 }
 
-void drawChar(WINDOW *charWin){
-  wattron(charWin, COLOR_PAIR(3));
-  mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, pacman.icon); // pacman
-  wattroff(charWin, COLOR_PAIR(3));
+void drawChar(WINDOW *win){
+  wattron(win, COLOR_PAIR(3));
+  mvwprintw(win, pacman.xLoc + border_padding, pacman.yLoc + border_padding, pacman.icon); // pacman
+  wattroff(win, COLOR_PAIR(3));
 
-  wattron(charWin, COLOR_PAIR(5));
-  mvwprintw(charWin, red_ghost.xLoc + border_padding, red_ghost.yLoc + border_padding, red_ghost.icon); //Red Ghost
-  wattroff(charWin, COLOR_PAIR(5));
+  wattron(win, COLOR_PAIR(5));
+  mvwprintw(win, red_ghost.xLoc + border_padding, red_ghost.yLoc + border_padding, red_ghost.icon); //Red Ghost
+  wattroff(win, COLOR_PAIR(5));
 
-  wattron(charWin, COLOR_PAIR(4));
-  mvwprintw(charWin, blue_ghost.xLoc + border_padding, blue_ghost.yLoc + border_padding, blue_ghost.icon); //Blue Ghost
-  wattroff(charWin, COLOR_PAIR(4));
+  wattron(win, COLOR_PAIR(4));
+  mvwprintw(win, blue_ghost.xLoc + border_padding, blue_ghost.yLoc + border_padding, blue_ghost.icon); //Blue Ghost
+  wattroff(win, COLOR_PAIR(4));
 
-  wattron(charWin, COLOR_PAIR(3));
-  mvwprintw(charWin, yellow_ghost.xLoc + border_padding, yellow_ghost.yLoc + border_padding, yellow_ghost.icon); //Yellow Ghost
-  wattroff(charWin, COLOR_PAIR(3));
+  wattron(win, COLOR_PAIR(3));
+  mvwprintw(win, yellow_ghost.xLoc + border_padding, yellow_ghost.yLoc + border_padding, yellow_ghost.icon); //Yellow Ghost
+  wattroff(win, COLOR_PAIR(3));
 
-  wattron(charWin, COLOR_PAIR(6));
-  mvwprintw(charWin, pink_ghost.xLoc + border_padding, pink_ghost.yLoc + border_padding, pink_ghost.icon); //Pink Ghost
-  wattroff(charWin, COLOR_PAIR(6));
+  wattron(win, COLOR_PAIR(6));
+  mvwprintw(win, pink_ghost.xLoc + border_padding, pink_ghost.yLoc + border_padding, pink_ghost.icon); //Pink Ghost
+  wattroff(win, COLOR_PAIR(6));
 }
 
-void input(WINDOW *charWin) {
+void input(WINDOW *win) {
     static int lastValidDirection = LEFT; // Retain the last valid direction
     static int desiredDirection = LEFT;  // Track the desired direction from user input
-    char ch = wgetch(charWin); // Get user input
+    char ch = wgetch(win); // Get user input
 
     // Update desired direction based on key press
     if (ch == 'w') desiredDirection = UP;
@@ -271,7 +278,7 @@ void input(WINDOW *charWin) {
 
     if (path_map[newX][newY] == 'p') {
         // If the desired direction is valid, move Pac-Man and update the direction and icon
-        mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
+        mvwprintw(win, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
         pacman.xLoc = newX;
         pacman.yLoc = newY;
         pacman.icon = newIcon; // Update the icon
@@ -291,7 +298,7 @@ void input(WINDOW *charWin) {
 
         if (path_map[newX][newY] == 'p') {
             // Continue moving in the last valid direction if possible
-            mvwprintw(charWin, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
+            mvwprintw(win, pacman.xLoc + border_padding, pacman.yLoc + border_padding, " "); // Clear old position
             pacman.xLoc = newX;
             pacman.yLoc = newY;
         }
