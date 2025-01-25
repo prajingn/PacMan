@@ -4,6 +4,8 @@
 # include <ncurses.h>
 # include <locale.h>
 # include <unistd.h>
+# include <stdlib.h>
+# include <time.h>
 
 const int mapHeight = 31;
 const int mapWidth = 82;
@@ -15,7 +17,7 @@ const int border_padding = 2;
 #define LEFT 2
 #define RIGHT 3
 
-int isRunning = 1, direction = LEFT, score = 0;
+int isRunning = 1, direction = LEFT, score = 0, end;
 
 // charcters structure
 struct character {
@@ -33,8 +35,23 @@ void drawMap(WINDOW *win);
 // Draw Characters function
 void drawChar(WINDOW *win);
 
+// Set Color Pallet
+void setColors();
+
+// Set character properties
+void setCharacterProperties();
+
 // Check score function
 int checkScore();
+
+// Function for ghost movement
+void moveGhosts();
+
+// Check for game termination
+int terminate();
+
+// print winner
+void printWinner();
 
 char map[31][82 + 1] = {
 "+ ------------------------------------ +  + ------------------------------------ +",
@@ -108,9 +125,43 @@ const char path_map[31][82 + 1] = {
 int main(){
 
   setlocale(LC_ALL, "");
+  srand(time(NULL));
+
   initscr(); //initalize ncurses and clears screen
   start_color(); //Enable colour output
-  {
+  setColors();
+  noecho(); //hides user inputs
+  curs_set(0); //hides curser
+  setCharacterProperties();
+
+  //window parameters
+  int height = mapHeight + 4, width = mapWidth + 4, start_y = 0, start_x = 0;
+  WINDOW *win = newwin(height, width, start_y, start_x);
+  nodelay(win, TRUE); // Enable non-blocking input
+  refresh();
+
+  while(isRunning){
+    box(win, 0, 0); // border
+    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
+    mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
+        mvwprintw(win, height-1, width - 30, " MOVE - W/A/S/D, QUIT - q "); // keys
+    drawMap(win); // map
+    drawChar(win); // pacman, ghosts
+    moveGhosts();
+    terminate();
+    score = checkScore(); //checks pellets left
+    usleep(50000); // delay
+    wrefresh(win);
+    input(win);
+  }
+
+  printWinner();
+
+  endwin(); //dealocates memory and exits ncurses
+  return 0;
+}
+
+void setColors(){
     init_pair(1, COLOR_BLUE, COLOR_BLACK); // walls
     init_color(COLOR_WHITE + 1, 1000, 1000, 400);
     init_pair(2, COLOR_WHITE + 1, COLOR_BLACK);// pills
@@ -118,10 +169,9 @@ int main(){
     init_pair(4, COLOR_BLUE, COLOR_BLACK);  //ghost
     init_pair(5, COLOR_RED, COLOR_BLACK); //ghost
     init_pair(6, COLOR_MAGENTA, COLOR_BLACK); //ghost
-  }
-  noecho(); //hides user inputs
-  curs_set(0); //hides curser
+}
 
+void setCharacterProperties(){
   //pacman properties
   pacman.xLoc = 23;
   pacman.yLoc = 40;
@@ -146,27 +196,6 @@ int main(){
   pink_ghost.xLoc = 14;
   pink_ghost.yLoc = 48;
   pink_ghost.icon = "ᗝ";
-
-  //window parameters
-  int height = mapHeight + 4, width = mapWidth + 4, start_y = 0, start_x = 0;
-  WINDOW *win = newwin(height, width, start_y, start_x);
-  nodelay(win, TRUE); // Enable non-blocking input
-  refresh();
-
-  while(isRunning){
-    box(win, 0, 0); // border
-    mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
-    mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
-    drawMap(win); // map
-    drawChar(win); // pacman, ghosts
-    score = checkScore(); //checks pellets left
-    usleep(50000); // delay
-    wrefresh(win);
-    input(win);
-  }
-
-  endwin(); //dealocates memory and exits ncurses
-  return 0;
 }
 
 void drawMap(WINDOW *win){ 
@@ -276,4 +305,44 @@ int checkScore(){
     }
 
   return score;
+}
+
+void moveGhosts(){
+  
+}
+
+int terminate(){
+  if (score == 1490){
+    end = 1; // won
+    isRunning = 0;
+  }
+
+  if(pacman.xLoc == red_ghost.xLoc && pacman.yLoc == red_ghost.yLoc){
+    end = 0; // lose
+    isRunning = 0;
+  }
+
+  if(pacman.xLoc == blue_ghost.xLoc && pacman.yLoc == blue_ghost.yLoc){
+    end = 0; // lose
+    isRunning = 0;
+  }
+
+  if(pacman.xLoc == yellow_ghost.xLoc && pacman.yLoc == yellow_ghost.yLoc){
+    end = 0; // lose
+    isRunning = 0;
+  }
+
+  if(pacman.xLoc == pink_ghost.xLoc && pacman.yLoc == pink_ghost.yLoc){
+    end = 0; // lose
+    isRunning = 0;
+  }
+}
+
+void printWinner(){
+  if (end == 1){
+    printf("You WON!!, score: %d + bonus %d = %d", score, 10, score+10);
+  }
+  if (end == 0){
+    printf("You LOST!!, score: %d + bonus 0 = %d", score, score);
+  }
 }
