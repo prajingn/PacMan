@@ -37,7 +37,7 @@ void drawMap(WINDOW*);
 void drawChar(WINDOW*);
 
 // Window decor
-void printBorderDecor(WINDOW*, int, int);
+void printBorder(WINDOW*, int, int);
 
 // Set Color Pallet
 void setColors();
@@ -55,7 +55,7 @@ void moveGhosts();
 int terminate();
 
 // print winner
-void printWinner();
+void printWinner(WINDOW *win);
 
 char map[31][82 + 1] = {
 "+ ------------------------------------ +  + ------------------------------------ +",
@@ -145,19 +145,17 @@ int main(){
   refresh();
 
   while(isRunning){
-    box(win, 0, 0); // border
-    printBorderDecor(win, height, width);
+    printBorder(win, height, width);
     drawMap(win); // map
     drawChar(win); // pacman, ghosts
-    moveGhosts();
     terminate();
+    moveGhosts();
     score = checkScore(); //checks pellets left
     usleep(50000); // delay
     wrefresh(win);
     input(win);
   }
-
-  printWinner();
+  printWinner(win);
 
   endwin(); //dealocates memory and exits ncurses
   return 0;
@@ -200,7 +198,8 @@ void setCharacterProperties(){
   pink_ghost.icon = "ᗝ";
 }
 
-void printBorderDecor(WINDOW* win, int height, int width){
+void printBorder(WINDOW* win, int height, int width){
+  box(win, 0, 0); // border
   mvwprintw(win, 0, 2, " PacMan ᗧ···ᗝ···ᗝ·· "); // border decoration
   mvwprintw(win, 0, width - 16, " ᗧ Score: %d ", score); // border decoration (score)
   mvwprintw(win, height-1, width - 30, " MOVE - W/A/S/D, QUIT - q "); // keys
@@ -444,11 +443,15 @@ int terminate(){
   }
 }
 
-void printWinner(){
-  if (end == 1){
-    printf("You WON!!, score: %d + bonus %d = %d", score, 10, score+10);
-  }
-  if (end == 0){
-    printf("You LOST!!, score: %d + bonus 0 = %d", score, score);
-  }
+void printWinner(WINDOW* win){
+    werase(win);  // Clear the window before writing
+    printBorder(win, mapHeight + 4, mapWidth + 4);  // Draw a Window decor
+    
+    if (end == 1){
+        mvwprintw(win, 15, 24, "You WON!! Score: %d + bonus %d = %d", score, 10, score + 10);
+    } else {
+        mvwprintw(win, 15, 24, "You LOST!! Score: %d + bonus 0 = %d", score, score);
+    }
+    wrefresh(win); // Refresh the window to display changes
+    getch();
 }
