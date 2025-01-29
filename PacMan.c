@@ -1,3 +1,4 @@
+// COMPATIBLITY -  ncurses library must be installed and the terminal must support color and unicode text
 // Compile using => gcc -o PacMan -std=c99 $(ncursesw6-config --cflags --libs) PacMan.c
 // map height = 31, map width = 82
 
@@ -103,9 +104,9 @@ const char path_map[31][82 + 1] = {
 "+ ------------ +  p  |  + ------ +  p  |  |  p  + ------ +  |  p  + ------------ +",
 "               |  p  |  + ------ +  p  +--+  p  + ------ +  |  p  |               ",
 "               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
-"               |  p  |  |  p  + ------gggggg------ +  p  |  |  p  |               ",
-"+------------- +  p  +  +  p  |  gggggggggggggggg  |  p  +  +  p  + -------------+",
-"| pppppppppppppppppppppppppp  |  gggggggggggggggg  |  pppppppppppppppppppppppppp |",
+"               |  p  |  |  p  + ------gg  gg------ +  p  |  |  p  |               ",
+"+------------- +  p  +  +  p  |  ggggggg  ggggggg  |  p  +  +  p  + -------------+",
+"| pppppppppppppppppppppppppp  |  ggggggg  ggggggg  |  pppppppppppppppppppppppppp |",
 "+------------- +  p  +  +  p  |                    |  p  +  +  p  + -------------+",
 "               |  p  |  |  p  + ------------------ +  p  |  |  p  |               ",
 "               |  p  |  |  pppppppppppppppppppppppppppp  |  |  p  |               ",
@@ -315,7 +316,105 @@ int checkScore(){
 }
 
 void moveGhosts(){
-  
+  //red
+  int redNewX = red_ghost.xLoc;
+  int redNewY = red_ghost.yLoc;
+  int red_Choice;
+  static int redDirection = LEFT;
+
+  switch (redDirection) {
+    case UP:    redNewX = red_ghost.xLoc - 1; redNewY = red_ghost.yLoc; break;
+    case DOWN:  redNewX = red_ghost.xLoc + 1; redNewY = red_ghost.yLoc; break;
+    case LEFT:  redNewX = red_ghost.xLoc;     redNewY = red_ghost.yLoc - 1; break;
+    case RIGHT: redNewX = red_ghost.xLoc;     redNewY = red_ghost.yLoc + 1; break;
+    default: break;
+  }
+  if (path_map[redNewX][redNewY] == 'p' || path_map[redNewX][redNewY] == 'g'){
+    red_ghost.xLoc = redNewX;
+    red_ghost.yLoc = redNewY;
+  }
+  else{
+      red_Choice = rand()%4;
+      if (red_Choice == 0) redDirection = UP;
+      if (red_Choice == 1) redDirection = DOWN;
+      if (red_Choice == 2) redDirection = LEFT;
+      if (red_Choice == 3) redDirection = RIGHT;
+  }
+
+  //yellow
+  int yellowNewX = yellow_ghost.xLoc;
+  int yellowNewY = yellow_ghost.yLoc;
+  int yellow_Choice;
+  static int yellowDirection = UP;
+
+  switch (yellowDirection) {
+    case UP:    yellowNewX = yellow_ghost.xLoc - 1; yellowNewY = yellow_ghost.yLoc; break;
+    case DOWN:  yellowNewX = yellow_ghost.xLoc + 1; yellowNewY = yellow_ghost.yLoc; break;
+    case LEFT:  yellowNewX = yellow_ghost.xLoc;     yellowNewY = yellow_ghost.yLoc - 1; break;
+    case RIGHT: yellowNewX = yellow_ghost.xLoc;     yellowNewY = yellow_ghost.yLoc + 1; break;
+    default: break;
+  }
+  if (path_map[yellowNewX][yellowNewY] == 'p' || path_map[yellowNewX][yellowNewY] == 'g'){
+    yellow_ghost.xLoc = yellowNewX;
+    yellow_ghost.yLoc = yellowNewY;
+  }
+  else{
+      yellow_Choice = rand()%4;
+      if (yellow_Choice == 0) yellowDirection = UP;
+      if (yellow_Choice == 1) yellowDirection = DOWN;
+      if (yellow_Choice == 2) yellowDirection = LEFT;
+      if (yellow_Choice == 3) yellowDirection = RIGHT;
+  }
+
+  //blue
+  int blueNewX = blue_ghost.xLoc;
+  int blueNewY = blue_ghost.yLoc;
+  int blue_Choice;
+  static int blueDirection = DOWN;
+
+  switch (blueDirection) {
+    case UP:    blueNewX = blue_ghost.xLoc - 1; blueNewY = blue_ghost.yLoc; break;
+    case DOWN:  blueNewX = blue_ghost.xLoc + 1; blueNewY = blue_ghost.yLoc; break;
+    case LEFT:  blueNewX = blue_ghost.xLoc;     blueNewY = blue_ghost.yLoc - 1; break;
+    case RIGHT: blueNewX = blue_ghost.xLoc;     blueNewY = blue_ghost.yLoc + 1; break;
+    default: break;
+  }
+  if (path_map[blueNewX][blueNewY] == 'p' || path_map[blueNewX][blueNewY] == 'g'){
+    blue_ghost.xLoc = blueNewX;
+    blue_ghost.yLoc = blueNewY;
+  }
+  else{
+      blue_Choice = rand()%4;
+      if (blue_Choice == 0) blueDirection = UP;
+      if (blue_Choice == 1) blueDirection = DOWN;
+      if (blue_Choice == 2) blueDirection = LEFT;
+      if (blue_Choice == 3) blueDirection = RIGHT;
+  }
+
+  //pink
+  int pinkNewX = pink_ghost.xLoc;
+  int pinkNewY = pink_ghost.yLoc;
+  int pink_Choice;
+  static int pinkDirection = RIGHT;
+
+  switch (pinkDirection) {
+    case UP:    pinkNewX = pink_ghost.xLoc - 1; pinkNewY = pink_ghost.yLoc; break;
+    case DOWN:  pinkNewX = pink_ghost.xLoc + 1; pinkNewY = pink_ghost.yLoc; break;
+    case LEFT:  pinkNewX = pink_ghost.xLoc;     pinkNewY = pink_ghost.yLoc - 1; break;
+    case RIGHT: pinkNewX = pink_ghost.xLoc;     pinkNewY = pink_ghost.yLoc + 1; break;
+    default: break;
+  }
+  if (path_map[pinkNewX][pinkNewY] == 'p' || path_map[pinkNewX][pinkNewY] == 'g'){
+    pink_ghost.xLoc = pinkNewX;
+    pink_ghost.yLoc = pinkNewY;
+  }
+  else{
+      pink_Choice = rand()%4;
+      if (pink_Choice == 0) pinkDirection = UP;
+      if (pink_Choice == 1) pinkDirection = DOWN;
+      if (pink_Choice == 2) pinkDirection = LEFT;
+      if (pink_Choice == 3) pinkDirection = RIGHT;
+  }
 }
 
 int terminate(){
