@@ -1,5 +1,5 @@
 // COMPATIBLITY -  ncurses library must be installed and the terminal must support color and unicode text
-// Compile using => gcc -o PacMan -std=c99 $(ncursesw6-config --cflags --libs) PacMan.c
+// Compile using => gcc PacMan.c -o PacMan -lncursesw
 // map height = 31, map width = 82
 
 # include <ncurses.h>
