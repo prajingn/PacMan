@@ -1,1 +1,1 @@
-# PacMan
+# PacMan in C using ncurses
